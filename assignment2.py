@@ -1,5 +1,6 @@
 # Them cac thu vien neu can
 import math
+import random
 
 class packet:
     def __init__(self, ID , xDes, yDes, volume, weight):
@@ -9,6 +10,25 @@ class packet:
         self.volume = volume
         self.weight = weight
         self.costPacket = 5 + volume + weight * 2
+
+class shipper:
+    def __init__(self, ID , X, Y, packetArray):
+        self.ID = ID
+        self.packetArray = packetArray
+        self.profit = profit(X, Y, packetArray)
+
+def probab(deltaE, T):
+    if deltaE>0:
+        return True
+    else:
+        if T==0:
+            return True
+        prob = math.exp(deltaE/T)
+        if (prob>random.uniform(0,1)):
+            return True
+        else:
+            return False
+    
 
 def distance(xDes1, yDes1, xDes2, yDes2):
     return math.sqrt(math.pow(xDes2 - xDes1, 2) + math.pow(yDes2 - yDes1, 2))
@@ -28,7 +48,6 @@ def profit(X, Y, packetArray):
         total_distance += distanceBetween(packetArray[x],packetArray[x+1])
 
     transportation_costs = total_distance / 40 * 20 +10
-
     return revenueDeliver - transportation_costs
 
 def readInput(file_input):
