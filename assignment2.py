@@ -5,17 +5,30 @@ import random
 class packet:
     def __init__(self, ID , xDes, yDes, volume, weight):
         self.ID = ID
-        self.xDes = xDes  #x of destination
+        self.xDes = xDes  # x of destination
         self.yDes = yDes  # y of destination
         self.volume = volume
         self.weight = weight
         self.costPacket = 5 + volume + weight * 2
 
 class shipper:
+    packetArray = []
+    profit = 0
     def __init__(self, ID , X, Y, packetArray):
         self.ID = ID
+        self.X = X
+        self.Y = Y
         self.packetArray = packetArray
         self.profit = profit(X, Y, packetArray)
+
+    def appendPacket(self, value):
+        self.packetArray.append(value)
+        self.profit = profit(self.X, self.Y, self.packetArray)
+
+    def removeTail(self):
+        self.packetArray.pop(-1)
+        self.profit = profit(self.X, self.Y, self.packetArray)
+
 
 def probab(deltaE, T):
     if deltaE>0:
@@ -39,6 +52,8 @@ def distanceBetween(packetA, packetB):
     return distance(packetA.xDes,packetA.yDes,packetB.xDes,packetB.yDes)
 
 def profit(X, Y, packetArray):
+    if len(packetArray)==0:
+        return 0
     revenueDeliver = 0
     for packet in packetArray:
         revenueDeliver += packet.costPacket
