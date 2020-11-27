@@ -5,7 +5,7 @@ import random
 class packet:
     def __init__(self, ID , xDes, yDes, volume, weight):
         self.ID = ID
-        self.xDes = xDes  # x of destination
+        self.xDes = xDes  #x of destination
         self.yDes = yDes  # y of destination
         self.volume = volume
         self.weight = weight
