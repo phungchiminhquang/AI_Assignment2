@@ -16,12 +16,12 @@ def probab(deltaE, T):
         if T==0:
             return False
         prob = math.exp(deltaE/T)
-        print("deltaE = ",deltaE,"|| T = ",T,"|| PROB = ",prob)
+        #print("deltaE = ",deltaE,"|| T = ",T,"|| PROB = ",prob)
         if (prob>random.uniform(0,1)):
-            print("return true")
+            #print("return true")
             return True
         else:
-            print("return false")
+            #print("return false")
             return False
     
 
@@ -76,9 +76,8 @@ class packet:
         self.costPacket = 5 + volume + weight * 2
 
 class shipper:
-    packetArray = []
-    profit = 0
     def __init__(self, id):
+        self.packetArray = []
         self.id = id
         self.profit = 0
 
@@ -86,17 +85,17 @@ class shipper:
         self.packetArray.append(packet)
         self.profit = profit(self.packetArray)
 
-    def removeTail(self):
-        self.packetArray.pop(-1)
+    def removePacket(self,packetIndex):
+        self.packetArray.pop(packetIndex)
         self.profit = profit(self.packetArray)
 
 class state:
     global NUM_PACKETS,NUM_SHIPPERS
-    packetArray = []
-    shipperArray = []
-    profitArray = []
-    var = 0
     def __init__(self, packetArray):
+        self.packetArray = []
+        self.shipperArray = []
+        self.profitArray = []
+        self.var = 0
         self.packetArray = packetArray
         for i in range(NUM_SHIPPERS):
             self.shipperArray.append(shipper(i))
@@ -104,9 +103,16 @@ class state:
         self.updateVar()
 
     def movePacketToShipper(self,packetIndex,shipperIndex):
-        print("packet : ",self.packetArray[packetIndex].id,"to shipper: ",shipperIndex)
+        #print("packet : ",self.packetArray[packetIndex].id,"to shipper: ",shipperIndex)
         self.shipperArray[shipperIndex].appendPacket(self.packetArray[packetIndex])
         self.packetArray.pop(packetIndex)
+        self.updateProfitArray()
+        self.updateVar()
+    
+    def getPacketFromShipper(self,packetIndex,shipperIndex):
+        #print("packet : ",self.shipperArray[shipperIndex].packetArray[packetIndex].id,"out from shipper: ",shipperIndex)
+        self.packetArray.append(self.shipperArray[shipperIndex].packetArray[packetIndex])
+        self.shipperArray[shipperIndex].removePacket(packetIndex)
         self.updateProfitArray()
         self.updateVar()
 
@@ -115,11 +121,18 @@ class state:
         for profit in self.profitArray:
             if(profit == 0):
                 self.var = self.var + 1000 # if there is any shipper dont have profit yet, we add 1000 to increase var
+        numPacketInWareHouse = len(self.packetArray)
+        self.var = self.var + 1000*numPacketInWareHouse
     def updateProfitArray(self):
         for i in range(NUM_SHIPPERS):
             self.profitArray[i] = (self.shipperArray[i].profit)
+    def printState(self):
+        for i in range(NUM_SHIPPERS):
+            print("shipper ",i," :")
+            for j in (self.shipperArray[i].packetArray):
+                print(j.id)
 
-def createNewState(currentState):
+def randomMovePacketToShipper(currentState):
     newState = copy.deepcopy(currentState)
     rangeForPacket = len(newState.packetArray) - 1
     if(rangeForPacket < 0):
@@ -128,7 +141,30 @@ def createNewState(currentState):
     randomPacketIndex = random.randint(0, rangeForPacket)
     randomShipperIndex = random.randint(0, rangeForShipper)
     newState.movePacketToShipper(randomPacketIndex, randomShipperIndex)
+    #newState.printState()
     return newState
+def randomGetPacketFromShipper(currentState):
+    newState = copy.deepcopy(currentState)
+    rangeForShipper = len(newState.shipperArray) - 1
+    randomShipperIndex = random.randint(0, rangeForShipper)
+    #print("randomShipperIndex: ",randomShipperIndex)
+    rangeForPacket = len(newState.shipperArray[randomShipperIndex].packetArray) - 1
+    #print("rangeForPacket: ",rangeForPacket)
+    if(rangeForPacket < 0):
+        return newState
+    
+    randomPacketIndex = random.randint(0,rangeForPacket)
+    newState.getPacketFromShipper(randomPacketIndex,randomShipperIndex)
+    return newState
+def createNewState(currentState):
+    if(len(currentState.packetArray)>0):
+        newState = randomMovePacketToShipper(currentState)
+        return newState
+    else:
+        #currentState.printState()
+        newState = randomGetPacketFromShipper(currentState)
+        newState = randomMovePacketToShipper(newState)
+        return newState
 
 
 def assign(file_input, file_output):
@@ -147,16 +183,14 @@ def assign(file_input, file_output):
     currentState = state(packetArray)
     T = currentState.var
     count = 0
-    for i in range(10):
+    while(1):
         T = currentState.var
-        print("T = ",T)
-        if(T == 0 or count == 3):
+        if(T == 0 or count == 70):
             break
-        newState = copy.deepcopy(createNewState(currentState))
+        newState = (createNewState(currentState))
         # print("newState.var = ",newState.var)
         # print("currentState.var = ",currentState.var)
         deltaE = currentState.var - newState.var
-        print("deltaE = ",deltaE)
         if(deltaE > 0):
             currentState = copy.deepcopy(newState)
             count = 0
@@ -167,8 +201,8 @@ def assign(file_input, file_output):
                 count = count+1
 
     print("final var = ",currentState.var)
-    print(currentState.profitArray)
-    print(currentState.shipperArray[0].packetArray[0].id)
+    print("profitArray: ",currentState.profitArray)
+    currentState.printState()
     # for i in range(NUM_SHIPPERS):
     #     print("shipper : ",i)
     #     # for j in range(len(currentState.shipperArray[i].packetArray)):
