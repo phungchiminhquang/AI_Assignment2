@@ -8,7 +8,33 @@ Y = 0 # y of ware house
 NUM_PACKETS = 0 # number of packet
 NUM_SHIPPERS = 0 # number of shipper
 
-
+def readInput(file_input):
+    File = open(file_input, 'r')
+    firstLine = File.readline()  # get first line
+    secondLine = File.readline()  # get second line
+    #GET X,Y OF WAREHOUSE FROM FIRST LINE#
+    [X, Y] = [int(i) for i in firstLine.split(' ')]
+    #GET NUMBER OF PACKET AND NUMBER OF DELIVERS FROM SECOND LINE#
+    [NUM_PACKETS, NUM_SHIPPERS] = [int(i) for i in secondLine.split(' ')]
+    #GET INFO OF ALL PACKETS#
+    packetArray = []
+    ID = 0
+    for line in File:  # get other line
+        [xDes, yDes, volume, weight] = [
+            int(i) for i in line.split(' ')]  # get number from string
+        packetArray.append(packet(ID, xDes, yDes, volume, weight))
+        ID += 1
+    #=========CLOSE FILE AND RETURN=====================#
+    File.close()
+    return X, Y, NUM_PACKETS, NUM_SHIPPERS, packetArray
+def writeOutput(currentState,file_ouput):
+    File = open(file_ouput,"w")
+    for i in range(NUM_SHIPPERS):
+        for j in range(len(currentState.shipperArray[i].packetArray)):
+            File.write(str(currentState.shipperArray[i].packetArray[j].id))
+            if(j!=len(currentState.shipperArray[i].packetArray)-1):File.write(" ")
+        if(i!=NUM_SHIPPERS -1):File.write("\n")
+    File.close()
 def probab(deltaE, T):
     if deltaE>0:
         return True
@@ -24,7 +50,6 @@ def probab(deltaE, T):
             #print("return false")
             return False
     
-
 def distance(xDes1, yDes1, xDes2, yDes2):
     return math.sqrt(math.pow(xDes2 - xDes1, 2) + math.pow(yDes2 - yDes1, 2))
 
@@ -47,25 +72,6 @@ def profit(packetArray):
     transportation_costs = total_distance / 40 * 20 +10
     return revenueDeliver - transportation_costs
 
-def readInput(file_input):
-    File = open(file_input, 'r')
-    firstLine = File.readline()  # get first line
-    secondLine = File.readline()  # get second line
-    #GET X,Y OF WAREHOUSE FROM FIRST LINE#
-    [X, Y] = [int(i) for i in firstLine.split(' ')]
-    #GET NUMBER OF PACKET AND NUMBER OF DELIVERS FROM SECOND LINE#
-    [NUM_PACKETS, NUM_SHIPPERS] = [int(i) for i in secondLine.split(' ')]
-    #GET INFO OF ALL PACKETS#
-    packetArray = []
-    ID = 0
-    for line in File:  # get other line
-        [xDes, yDes, volume, weight] = [
-            int(i) for i in line.split(' ')]  # get number from string
-        packetArray.append(packet(ID, xDes, yDes, volume, weight))
-        ID += 1
-    #=========CLOSE FILE AND RETURN=====================#
-    File.close()
-    return X, Y, NUM_PACKETS, NUM_SHIPPERS, packetArray
 class packet:
     def __init__(self, id , xDes, yDes, volume, weight):
         self.id = id
@@ -119,7 +125,7 @@ class state:
     def updateVar(self):
         self.var = numpy.var(self.profitArray)
         for profit in self.profitArray:
-            if(profit == 0):
+            if(profit <= 0):
                 self.var = self.var + 1000 # if there is any shipper dont have profit yet, we add 1000 to increase var
         numPacketInWareHouse = len(self.packetArray)
         self.var = self.var + 1000*numPacketInWareHouse
@@ -203,6 +209,7 @@ def assign(file_input, file_output):
     print("final var = ",currentState.var)
     print("profitArray: ",currentState.profitArray)
     currentState.printState()
+    writeOutput(currentState,file_output)
     # for i in range(NUM_SHIPPERS):
     #     print("shipper : ",i)
     #     # for j in range(len(currentState.shipperArray[i].packetArray)):
