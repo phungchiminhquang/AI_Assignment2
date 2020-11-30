@@ -27,6 +27,7 @@ def readInput(file_input):
     #=========CLOSE FILE AND RETURN=====================#
     File.close()
     return X, Y, NUM_PACKETS, NUM_SHIPPERS, packetArray
+    
 def writeOutput(currentState,file_ouput):
     File = open(file_ouput,"w")
     for i in range(NUM_SHIPPERS):
@@ -35,6 +36,7 @@ def writeOutput(currentState,file_ouput):
             if(j!=len(currentState.shipperArray[i].packetArray)-1):File.write(" ")
         if(i!=NUM_SHIPPERS -1):File.write("\n")
     File.close()
+
 def probab(deltaE, T):
     if deltaE>0:
         return True
@@ -179,10 +181,10 @@ def assign(file_input, file_output):
     # note that readInput() function return 5 value
     # ====this is an example of using readInput() and profit()======================#
     [X, Y, NUM_PACKETS, NUM_SHIPPERS, packetArray] = readInput(file_input)
-    print("X = ",X,"|| Y = ",Y)
-    print("NUM_PACKETS = ",NUM_PACKETS,"|| NUM_SHIPPERS = ", NUM_SHIPPERS)
-    for obj in packetArray:
-        print(obj.id, obj.xDes, obj.yDes, obj.volume, obj.weight, obj.costPacket)
+    #print("X = ",X,"|| Y = ",Y)
+    #print("NUM_PACKETS = ",NUM_PACKETS,"|| NUM_SHIPPERS = ", NUM_SHIPPERS)
+    # for obj in packetArray:
+    #     print(obj.id, obj.xDes, obj.yDes, obj.volume, obj.weight, obj.costPacket)
     #==================================================================#
     # run algorithm
     # write output
@@ -206,9 +208,9 @@ def assign(file_input, file_output):
             else:
                 count = count+1
 
-    print("final var = ",currentState.var)
-    print("profitArray: ",currentState.profitArray)
-    currentState.printState()
+    # print("final var = ",currentState.var)
+    # print("profitArray: ",currentState.profitArray)
+    # currentState.printState()
     writeOutput(currentState,file_output)
     # for i in range(NUM_SHIPPERS):
     #     print("shipper : ",i)
