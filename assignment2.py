@@ -193,7 +193,7 @@ def assign(file_input, file_output):
     count = 0
     while(1):
         T = currentState.var
-        if(T == 0 or count == 70):
+        if(T == 0 or count == 60):
             break
         newState = (createNewState(currentState))
         # print("newState.var = ",newState.var)
@@ -208,7 +208,7 @@ def assign(file_input, file_output):
             else:
                 count = count+1
 
-    # print("final var = ",currentState.var)
+    print("final var = ",currentState.var)
     # print("profitArray: ",currentState.profitArray)
     # currentState.printState()
     writeOutput(currentState,file_output)
