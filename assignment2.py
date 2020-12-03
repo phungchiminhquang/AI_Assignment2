@@ -219,7 +219,7 @@ def assign(file_input, file_output):
     #     print(len(currentState.shipperArray[i].packetArray))
     
     
-    return 
+    return NUM_PACKETS, NUM_SHIPPERS
 
 
 assign('input.txt', 'output.txt')
