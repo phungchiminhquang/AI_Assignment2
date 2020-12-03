@@ -2,7 +2,7 @@
 import numpy
 import copy
 import math
-import random
+import random, time
 X = 0 # x of ware house
 Y = 0 # y of ware house
 NUM_PACKETS = 0 # number of packet
@@ -176,6 +176,7 @@ def createNewState(currentState):
 
 
 def assign(file_input, file_output):
+    start = time.time()
     global X,Y,NUM_PACKETS,NUM_SHIPPERS # this line is very important
     # read input
     # note that readInput() function return 5 value
@@ -191,7 +192,7 @@ def assign(file_input, file_output):
     currentState = state(packetArray)
     T = currentState.var
     count = 0
-    while(1):
+    while(time.time()-start<=300):
         T = currentState.var
         if(T == 0 or count == 60):
             break
@@ -208,10 +209,10 @@ def assign(file_input, file_output):
             else:
                 count = count+1
 
-    print("final var = ",currentState.var)
+    print("final var = ", currentState.var)
     # print("profitArray: ",currentState.profitArray)
     # currentState.printState()
-    writeOutput(currentState,file_output)
+    writeOutput(currentState, file_output)
     # for i in range(NUM_SHIPPERS):
     #     print("shipper : ",i)
     #     # for j in range(len(currentState.shipperArray[i].packetArray)):
